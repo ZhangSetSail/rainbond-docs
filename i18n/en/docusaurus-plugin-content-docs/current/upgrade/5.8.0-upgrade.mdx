@@ -39,7 +39,7 @@ curl https://rainbond-script.oss-cn-hangzhou .aliyuncs.com/upgrade-5.8.0.sh | ba
 - If the console is allinone started, execute the following operations
 
 ```bash
-docker exec -it rainbond-allinone bash
+nerdctl exec -it rainbond-allinone bash
 curl https://rainbond-script.oss-cn-hangzhou.aliyuncs. com/upgrade-5.8.0.sh | bash
 ```
 
@@ -54,9 +54,9 @@ curl https://rainbond-script .oss-cn-hangzhou.aliyuncs.com/upgrade-5.8.0.sh | ba
 - If the console is allinone startup, execute the following operations
 
 ```bash
-docker stop rainbond-allinone && docker rm rainbond-allinone
+nerdctl stop rainbond-allinone && nerdctl rm rainbond-allinone
 #This command parameter needs to be the same as the rainbond-allinone container started before
-docker run -d -p 7070:7070 -v ~/.ssh:/root/.ssh -v ~/ rainbonddata:/app/data \
+nerdctl run -d -p 7070:7070 -v ~/.ssh:/root/.ssh -v ~/ rainbonddata:/app/data \
 --name=rainbond-allinone --restart=always \
 registry.cn-hangzhou.aliyuncs.com/goodrain/rainbond:v5.8.0-release-allinone
 ```
@@ -70,7 +70,7 @@ as control To install through the application market, enter the console applicat
 **1. Update grctl command**
 
 ```bash
-docker run -it --rm -v /:/rootfs registry.cn-hangzhou.aliyuncs.com/goodrain/rbd-grctl:v5.8.0-release copy
+nerdctl run -it --rm -v /:/rootfs registry.cn-hangzhou.aliyuncs.com/goodrain/rbd-grctl:v5.8.0-release copy
 mv /usr/local/bin/rainbond-grctl /usr/ local/bin/grctl && grctl install
 ```
 

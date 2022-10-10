@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 
 :::caution
 
-1. 安装 Docker 
+1. 机器上需要安装 containerd 服务以及 nerdctl 工具
 2. 可用内存至少大于 4G，推荐 8G 以上
 3. 可用磁盘 50G 以上
 4. 机器上 80、443、6060、6443、7070、8443 端口可用
@@ -31,14 +31,14 @@ import TabItem from '@theme/TabItem';
 将 Rainbond dind 镜像在有网络的环境下 PULL 到本地并打成 tar 包。
 
 ```shell
-docker pull rainbond/rainbond:v5.8.1-dind-allinone
-docker save -o rainbond-v5.8.1-dind-allinone.tar rainbond/rainbond:v5.8.1-dind-allinone
+nerdctl pull rainbond/rainbond:v5.8.1-dind-allinone
+nerdctl save -o rainbond-v5.8.1-dind-allinone.tar rainbond/rainbond:v5.8.1-dind-allinone
 ```
 
 导入 tar 包到目标服务器中。
 
 ```shell
-docker load -i rainbond-v5.8.1-dind-allinone.tar
+nerdctl load -i rainbond-v5.8.1-dind-allinone.tar
 ```
 
 <h2> 2. 设置 EIP 环境变量(必填) </h2>
@@ -59,15 +59,18 @@ export EIP=<你的IP地址>
 <h2> 3. 启动 Rainbond </h2>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+mkdir -p ~/containerddata 
+mkdir -p /opt/rainbond
+mkdir -p ~/rainbonddata
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \
 -v /opt/rainbond:/opt/rainbond \
--v ~/dockerdata:/var/lib/docker \
+-v ~/containerddata:/var/lib/con \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.1-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 执行完上述命令后，耐心等待 5-10 分钟，可以看到如下日志输出，表示 Rainbond 已启动完成
@@ -138,14 +141,14 @@ TEST SUITE: None
 将 Rainbond dind 镜像在有网络的环境下 PULL 到本地并打成 tar 包。
 
 ```shell
-docker pull rainbond/rainbond:v5.8.0-arm64-dind-allinone
-docker save -o rainbond-v5.8.0-arm64-dind-allinone.tar rainbond/rainbond:v5.8.0-arm64-dind-allinone
+nerdctl pull rainbond/rainbond:v5.8.0-arm64-dind-allinone
+nerdctl save -o rainbond-v5.8.0-arm64-dind-allinone.tar rainbond/rainbond:v5.8.0-arm64-dind-allinone
 ```
 
 导入 tar 包到目标服务器中。
 
 ```shell
-docker load -i rainbond-v5.8.0-arm64-dind-allinone.tar
+nerdctl load -i rainbond-v5.8.0-arm64-dind-allinone.tar
 ```
 
 <h2> 2. 设置 EIP 环境变量(必填)</h2>
@@ -166,15 +169,15 @@ export EIP=<你的IP地址>
 <h2> 3. 启动 Rainbond </h2>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \
 -v /opt/rainbond:/opt/rainbond \
--v ~/dockerdata:/var/lib/docker \
+-v ~/containerddata:/var/lib/containerddata \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.0-arm64-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 执行完上述命令后，耐心等待 5-10 分钟，可以看到如下日志输出，表示 Rainbond 已启动完成

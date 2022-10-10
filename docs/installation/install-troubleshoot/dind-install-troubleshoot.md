@@ -24,62 +24,16 @@ description: 'troubleshot'
 在整个安装过程中，会按照以下顺序依次执行一些任务：
 
 1. 启动 supervisord 进程管理器
-2. 启动容器内 dockerd 服务
-3. 启动容器内 k3s 服务
-4. 启动 Rainbond 各组件
+2. 启动容器内 k3s 服务
+3. 启动 Rainbond 各组件
 
 整个排查的过程，也将围绕这些任务的执行情况开展。
 
 开始排查之前，启动新的终端，执行以下命令，进入 rainbond-allinone 容器环境中：
 
 ```bash
-docker exec -ti rainbond-allinone bash
+nerdctl exec -ti rainbond-allinone bash
 ```
-
-## 启动supervisord阶段
-
-supervisord 是一款简洁而健壮的进程管理器，单机体验版本 Rainbond 通过它统一管理所有的服务。
-
-supervisord 并不容易出错，如果在之前的 `docker run ...` 启动过程中，并没有在终端输出中发现明显的 error 级别日志输出，那么说明它工作正常，可以跳过当前排查步骤。
-
-## 启动dockerd阶段
-
-rainbond-allinone 容器中会启动一个以后台进程方式运行的 dockerd 服务，后续会通过它启动和管理一系列的容器。
-
-在终端中执行以下命令，来确定 dockerd 是否正常启动。
-
-```bash
-docker info
-```
-
-如若正确返回当前 dockerd 服务的详细信息，则说明 dockerd 服务运行正常，可以跳过当前排查步骤。
-
-如若返回以下信息，则说明 dockerd 启动失败，根据 dockerd 日志深入排查。
-
-```
-Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
-```
-
-### dockerd日志
-
-dockerd 服务的启动日志位于文件 `/app/logs/dind.log` 中，查询日志内容，关注 error 级别日志输出。以下列举一些可能的情形及解决方案。
-
-### dockerd常见问题列表
-
-在日志 `/app/logs/dind.log` 中，可能会发现以下 error 级别的日志输出。
-
-- failed to start daemon: Error initializing network controller: error obtaining controller instance: failed to create NAT chain DOCKER: iptables failed: iptables -t nat -N DOCKER: iptables v1.6.0: can't initialize iptables table `nat': Table does not exist (do you need to insmod?)
-
-:::info
-dockerd 的运行依赖于 iptables 内核模块，在一些特定的操作系统中，可能并没有加载 iptables 内核模块（可能使用nftables）。尝试在宿主机中执行 `modprobe ip_tables` 来加载这个模块。
-:::
-
-- failed to start daemon: pid file found, ensure docker is not running or delete /var/run/docker.pid
-
-:::info
-这种情况的出现意味着上一次容器未能正常关闭，手动删除 /var/run/docker.pid 文件后，重启 rainbond-allinone 容器。
-:::info
-
 
 ## 启动k3s阶段
 
@@ -117,28 +71,21 @@ k3s 服务的启动日志位于文件 `/app/logs/k3s.log` 中，查询日志内�
 - unable to create proxier: unable to create ipv4 proxier: can't set sysctl net/ipv4/conf/all/route_localnet to 1: open /proc/sys/net/ipv4/conf/all/route_localnet: read-only file system
 
 :::info
-确认你的 `docker run ...` 启动命令中，是否省略了参数 `--privileged` 或者 `-v ~/rainbonddata:/app/data`。如果你自定义了 k3s 的数据持久化目录，也应加入对应的持久化挂载路径设置。
+确认你的 `nerdctl run ...` 启动命令中，是否省略了参数 `--privileged` 或者 `-v ~/rainbonddata:/app/data`。如果你自定义了 k3s 的数据持久化目录，也应加入对应的持久化挂载路径设置。
 :::
 
 - Failed to create cgroup" err="cannot enter cgroupv2 \"/sys/fs/cgroup/kubepods\" with domain controllers -- it is in an invalid state
 
-:::info
-在早些版本的 rainbond-allinone 中，尚未支持 cgroupv2。而 cgroupv2 在高于 4.2.0 版本的 Docker Desktop 中被应用，这导致了冲突。所以请降级 Docker Desktop 到 4.2.0 版本及以下。或使用最新版本的单机体验版本的 Rainbond。
-:::
 
 - level=info msg="Set sysctl 'net/netfilter/nf_conntrack_max' to 196608
 - level=error msg="Failed to set sysctl: open /proc/sys/net/netfilter/nf_conntrack_max: permission denied
 
 :::info
 遭遇以上问题时，可以在主机中修改对应的参数为日志中的相同值，在 linux 操作系统中，执行 `sysctl -w net/netfilter/nf_conntrack_max=196608` ;
-如果上述操作没有能够解决问题，或者在非 linux 操作系统中遭遇这个问题，可以在 `docker run ...` 启动命令中添加环境变量 `-e K3S_ARGS="--kube-proxy-arg=conntrack-max-per-core=0"`。
+如果上述操作没有能够解决问题，或者在非 linux 操作系统中遭遇这个问题，可以在 `nerdctl run ...` 启动命令中添加环境变量 `-e K3S_ARGS="--kube-proxy-arg=conntrack-max-per-core=0"`。
 :::
 
 - /usr/lib/libbz2.so.1.0.8: no space left on device
-
-:::info
-主机中的磁盘空间不足，增加磁盘空间或删除不必要的文件释放空间；对于 Docker Desktop 用户而言，可以参考 [Disk utilization](https://docs.docker.com/desktop/mac/space/) 学习变更磁盘空间限额。
-:::
 
 
 ## 启动Rainbond阶段
@@ -195,9 +142,6 @@ Evicted 状态意味着当前 pod 遭到了调度系统的驱逐，触发驱逐�
 查看 pod 详细信息可能会遇到以下问题
 - {"type":"Warning","reason":"FailedScheduling","message":"0/1 nodes are available: 1 node(s) had taint {node.kubernetes.io/disk-pressure: }, that the pod didn't tolerate.","from":"","age":"0s"}]}]}
 
-:::info
-以上报错可以通过几点进行分析，第一：确认一下当前节点是否开启了允许调度，一般 master节点时不被允许调度，所以会出现此报错，第二：docker 以及基础环境没有分配足够的资源时，你也可以得到这种“污点”类型的消息。 例如，在 Docker Desktop for Mac 中，在首选项中分配更多内存/cpu/swap，以及其他的资源，它可能会解决您的问题。
-:::
 
 ## 问题报告
 

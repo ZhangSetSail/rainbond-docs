@@ -32,18 +32,11 @@ The cluster architecture is shown in Figure：
 
 
 
-### 2. Deploy Docker
+### 2. Deploy containerd and nerdctl
 
-Execute install Docker action：on all servers that have been prepared
+- Install containerd reference [containerd](https://github.com/containerd/containerd/blob/main/docs/getting-started.md).
 
-
-
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
-
-
-
+- Download address for installing [nerdctl](https://github.com/containerd/nerdctl/releases).
 
 ### 3. Deploy MySQL database
 

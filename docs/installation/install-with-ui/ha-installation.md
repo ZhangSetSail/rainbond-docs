@@ -28,13 +28,11 @@ description: "高可用安装Rainbond集群"
 ![avatar](https://static.goodrain.com/docs/5.4/user-operations/install/ha-deployment/ha-installation/architecture.png)
 
 
-### 二. 部署Docker
+### 二. 部署 containerd 及 nerdctl 工具
 
-在已准备的所有服务器上执行安装Docker操作：
+containerd 安装参考 [官方文档](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
+nerdctl 下载地址 [nerdctl](https://github.com/containerd/nerdctl/releases)
 
 ### 三. 部署MySQL数据库
 
@@ -53,7 +51,7 @@ Rainbond需要使用MySQL存储控制台及集群端数据，若用户已有高�
 #### 启动 All-In-One 控制台
 
 ```bash
-docker run -d -p 7070:7070  \
+nerdctl run -d -p 7070:7070  \
 --name=rainbond-allinone --restart=always \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \

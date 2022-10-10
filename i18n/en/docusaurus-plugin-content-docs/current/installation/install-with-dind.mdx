@@ -13,7 +13,7 @@ The current installation method can quickly experience the full functionality of
 ## Pre
 
 :::caution
-1. Install Docker
+1. Install containerd and nerdctl
 2. Memory greater than 2G, 4G or above recommended
 3. Disk 50G or above recommended
 4. Open ports 80 443 6060 6443 7070 8443
@@ -28,13 +28,15 @@ The next steps will guide you to get Rainbond running quickly on your machine
 <Tabs groupId="install">
   <TabItem value="Linux" label="Linux" default>
 
-<h3>1. Install Docker</h3>
+<h3>1. install containerd</h3>
 
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
+Refer to containerd [Official documents](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-<h3>2. Set EIP(Required)</h3>
+<h3>2. install nerdctl</h3>
+
+Download address [nerdctl](https://github.com/containerd/nerdctl/releases)
+
+<h3>3. Set EIP(Required)</h3>
 
 **You need to specify an IP address, After deployment is complete, This IP address will be used to access the Rainbond. The IP is set through the env `EIP`.**
 
@@ -49,18 +51,21 @@ eg: `export EIP=127.0.0.1`
 export EIP=<Your IP ADDR>
 ```
 
-<h3>3. Install Rainbond</h3>
+<h3>4. Install Rainbond</h3>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+mkdir -p ~/containerddata 
+mkdir -p /opt/rainbond
+mkdir -p ~/rainbonddata
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \
 -v /opt/rainbond:/opt/rainbond \
--v ~/dockerdata:/var/lib/docker \
+-v ~/containerddata:/var/lib/containerd \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.1-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 **After executing the above command, wait patiently for 5-10 minutes, You can see the following log output, indicating that Rainbond has been started.**
@@ -119,7 +124,7 @@ TEST SUITE: None
 ```
 </details>
 
-<h3>4. Access Rainbond</h3>
+<h3>5. Access Rainbond</h3>
 
 **At this point, you have successfully installed Rainbond, you can now access according to the access address prompted in the log, and start your experience journey**
 
@@ -131,11 +136,15 @@ Notice: Allinone has cluster is installed by default, No need to perform a host-
 
   <TabItem value="Linux with Arm" label="Linux With Arm">
 
-<h3>1. Install Docker</h3>
+<h3>1. install containerd</h3>
 
-Refer to the Docker [official documentation](https://docs.docker.com/engine/install/#server) to install arm version of docker.
+Refer to containerd [Official documents](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-<h3>2. Set EIP(Required)</h3>
+<h3>2. install nerdctl</h3>
+
+Download address [nerdctl](https://github.com/containerd/nerdctl/releases)
+
+<h3>3. Set EIP(Required)</h3>
 
 **You need to specify an IP address, After deployment is complete, This IP address will be used to access the Rainbond. The IP is set through the env `EIP`.**
 
@@ -150,18 +159,21 @@ eg: `export EIP=127.0.0.1`
 export EIP=<Your IP ADDR>
 ```
 
-<h3>3. Install Rainbond</h3>
+<h3>4. Install Rainbond</h3>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+mkdir -p ~/containerddata 
+mkdir -p /opt/rainbond
+mkdir -p ~/rainbonddata
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \
 -v /opt/rainbond:/opt/rainbond \
--v ~/dockerdata:/var/lib/docker \
+-v ~/containerddata:/var/lib/containerd \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.1-arm64-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 **After executing the above command, wait patiently for 5-10 minutes, You can see the following log output, indicating that Rainbond has been started.**
@@ -220,7 +232,7 @@ TEST SUITE: None
 ```
 </details>
 
-<h3>4. Access Rainbond</h3>
+<h3>5. Access Rainbond</h3>
 
 **At this point, you have successfully installed Rainbond, you can now access according to the access address prompted in the log, and start your experience journey**
 
@@ -232,11 +244,15 @@ Notice: Allinone has cluster is installed by default, No need to perform a host-
 
   <TabItem value="Mac with Intel" label="Mac with Intel">
 
-<h3>1. Install Docker</h3>
+<h3>1. install containerd</h3>
 
-**Download [Docker Desktop](https://docs.docker.com/desktop/mac/release-notes/#docker-desktop)**
+Refer to containerd [Official documents](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-<h3>2. Set EIP(Required)</h3>
+<h3>2. install nerdctl</h3>
+
+Download address [nerdctl](https://github.com/containerd/nerdctl/releases)
+
+<h3>3. Set EIP(Required)</h3>
 
 **You need to specify an IP address, After deployment is complete, This IP address will be used to access the Rainbond. The IP is set through the env `EIP`.**
 
@@ -251,17 +267,17 @@ eg: `export EIP=127.0.0.1`
 export EIP=<Your IP ADDR>
 ```
 
-<h3>3. Install Rainbond</h3>
+<h3>4. Install Rainbond</h3>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/opt/rainbond:/opt/rainbond \
 -v ~/rainbonddata:/app/data \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.1-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 **After executing the above command, wait patiently for 5-10 minutes, You can see the following log output, indicating that Rainbond has been started.**
@@ -320,7 +336,7 @@ TEST SUITE: None
 ```
 </details>
 
-<h3>4. Access Rainbond</h3>
+<h3>5. Access Rainbond</h3>
 
 **At this point, you have successfully installed Rainbond, you can now access according to the access address prompted in the log, and start your experience journey**
 
@@ -332,11 +348,15 @@ Notice: Allinone has cluster is installed by default, No need to perform a host-
 
  <TabItem value="Mac with M1" label="Mac with M1">
 
-<h3>1. Install Docker</h3>
+<h3>1. install containerd</h3>
 
-**Download [Docker Desktop](https://docs.docker.com/desktop/mac/release-notes/#docker-desktop)**
+Refer to containerd [Official documents](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-<h3>2. Set EIP(Required)</h3>
+<h3>2. install nerdctl</h3>
+
+Download address [nerdctl](https://github.com/containerd/nerdctl/releases)
+
+<h3>3. Set EIP(Required)</h3>
 
 **You need to specify an IP address, After deployment is complete, This IP address will be used to access the Rainbond. The IP is set through the env `EIP`.**
 
@@ -351,17 +371,17 @@ eg: `export EIP=127.0.0.1`
 export EIP=<Your IP ADDR>
 ```
 
-<h3>3. Install Rainbond</h3>
+<h3>4. Install Rainbond</h3>
 
 ```bash
-docker run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
+nerdctl run --privileged -d -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 \
 --name=rainbond-allinone --restart=on-failure \
 -v ~/.ssh:/root/.ssh \
 -v ~/opt/rainbond:/opt/rainbond \
 -v ~/rainbonddata:/app/data \
 -e EIP=$EIP \
 rainbond/rainbond:v5.8.1-arm64-dind-allinone \
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 **After executing the above command, wait patiently for 5-10 minutes, You can see the following log output, indicating that Rainbond has been started.**
@@ -420,7 +440,7 @@ TEST SUITE: None
 ```
 </details>
 
-<h3>4. Access Rainbond</h3>
+<h3>5. Access Rainbond</h3>
 
 **At this point, you have successfully installed Rainbond, you can now access according to the access address prompted in the log, and start your experience journey**
 
@@ -432,11 +452,15 @@ Notice: Allinone has cluster is installed by default, No need to perform a host-
 
   <TabItem value="Windows" label="Windows">
 
-<h3>1. Install Docker</h3>
+<h3>1. install containerd</h3>
 
-**Download [Docker Desktop](https://docs.docker.com/desktop/windows/install/)**
+Refer to containerd [Official documents](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-<h3>2. Set EIP(Required)</h3>
+<h3>2. install nerdctl</h3>
+
+Download address [nerdctl](https://github.com/containerd/nerdctl/releases)
+
+<h3>3. Set EIP(Required)</h3>
 
 **You need to specify an IP address, After deployment is complete, This IP address will be used to access the Rainbond. The IP is set through the env `EIP`.**
 
@@ -453,14 +477,14 @@ eg: `-e EIP=127.0.0.1`
 **After copying the startup command below, Please edit manually `-e EIP=<Your IP ADDR>` env.**
 
 ```bash
-docker run --privileged -d  -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 ^
+nerdctl run --privileged -d  -p 7070:7070 -p 80:80 -p 443:443 -p 6060:6060 -p 8443:8443 ^
 --name=rainbond-allinone --restart=on-failure ^
 -v ~/.ssh:/root/.ssh ^
 -v ~/rainbonddata:/app/data ^
 -v ~/opt/rainbond:/opt/rainbond ^
 -e EIP=<Your IP ADDR> ^
 rainbond/rainbond:v5.8.1-dind-allinone ^
-&& docker logs -f rainbond-allinone
+&& nerdctl logs -f rainbond-allinone
 ```
 
 **After executing the above command, wait patiently for 5-10 minutes, You can see the following log output, indicating that Rainbond has been started.**
@@ -519,7 +543,7 @@ TEST SUITE: None
 ```
 </details>
 
-<h3>4. Access Rainbond</h3>
+<h3>5. Access Rainbond</h3>
 
 **At this point, you have successfully installed Rainbond, you can now access according to the access address prompted in the log, and start your experience journey**
 

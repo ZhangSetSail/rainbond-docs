@@ -21,23 +21,6 @@ description: 'troubleshot'
 
 :::warning
 报错信息提示:
-Cluster must have at least one etcd plane host
-
-<img src="https://static.goodrain.com/docs/5.3/operator/error.png" title="install" width="100%" />
-:::
-
-这种情况一般是你配置的节点 IP 地址或 SSH 端口不正确或端口有防火墙策略，导致控制台无法连接指定的节点。重新配置正确的节点 IP 地址和 SSH 端口，或开启 SSH 端口的防火墙策略。
-
-另一种可能的情况，是安装 Rainbond 所使用的宿主机节点中， 目录 `/home/docker/.ssh` 的属主和属组不是 docker 用户，执行以下命令改正后重试：
-
-```bash
-chown docker:docker /home/docker/.ssh
-```
-
----
-
-:::warning
-报错信息提示:
 rejected: administratively prohibited
 :::
 
@@ -71,7 +54,7 @@ kubectl get node
 如果某个节点处于 `NotReady` 状态，通过以下命令在对应节点查询 `kubelet` 日志，根据日志输出解决节点问题：
 
 ```bash
-docker logs -f kubelet
+nerdctl logs -f kubelet
 ```
 
 :::info
@@ -128,19 +111,6 @@ Failed to find any valid interface to use: failed to get default interface: Unab
 
 ---
 
-:::warning
-内核版本过高或过低：
-
-特指内核版本低于 3.10.0-514 或者高于 5.16
-:::
-
-操作系统内核版本低于 3.10.0-514 将导致无法受到 docker overlay2 存储引擎的支持。
-
-版本高于 5.16 的某些内核会导致容器无法被创建。
- 
-推荐参考 [升级内核版本](https://t.goodrain.com/t/topic/1305) 安装 kernel-lt 分支的长期支持版内核。
-
----
 ## Rainbond 集群初始化异常情况分析
 
 Rainbond 集群初始化控制过程如下：
@@ -268,7 +238,7 @@ kubectl describe pod <pod name>  -n  rbd-system
 在本地查看镜像是否存在
 
 ```bash
-docker images | grep <image name>
+nerdctl images | grep <image name>
 ```
 
 - CrashLoopBackOff
@@ -281,7 +251,7 @@ kubectl logs --previous <pod name> -n  rbd-system
 
 - Evicted
 
-驱逐状态，多见于资源不足时导致的 Pod 被驱逐，一般情况下是由于系统内存或磁盘资源不足，可 `df -Th` 查看 docker数据目录 的资源使用情况，如果百分比大于85%，就要及时清理下资源，尤其是一些大文件、docker镜像。
+驱逐状态，多见于资源不足时导致的 Pod 被驱逐，一般情况下是由于系统内存或磁盘资源不足，可 `df -Th` 查看 containerd 数据目录 的资源使用情况，如果百分比大于85%，就要及时清理下资源，尤其是一些大文件、containerd 镜像。
 
 使用如下命令可以清除状态为Evicted的pod：
 

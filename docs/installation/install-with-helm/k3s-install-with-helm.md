@@ -12,20 +12,17 @@ description: '基于已有的 k3s 集群，使用 helm 从零开始安装 Rainbo
 - 确保服务器安装了 NFS 客户端
   - 对接外部存储时，则无需安装
 
-- K3s 的启动需要指定启动参数 `–-docker –-disable traefik`
-  - K3s启动默认会使用 Containerd 作为容器的运行环境，同时会安装 Traefik 作为 K3s 的 ingress controller，会出现端口冲突。
-
-- 确保服务器已经安装了 Docker
-
 :::caution
-注意：Rainbond 默认会使用 Docker 作为容器的运行时，同时 Rainbond 的 rbd-gatway 网关会作为 Ingress controller，所以需要修改 K3s 的启动参数，并卸载已安装的 Traefik 或指定没有安装 Traefik 的节点为 Rainbond的网关节点。
+注意：Rainbond 默认会使用 containerd 作为容器的运行时，同时 Rainbond 的 rbd-gatway 网关会作为 Ingress controller，所以需要修改 K3s 的启动参数，并卸载已安装的 Traefik 或指定没有安装 Traefik 的节点为 Rainbond的网关节点。
 :::
 
-### 安装 Docker
+### 安装 containerd
 
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
+参考 containerd [官方文档](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
+
+### 安装 nerdctl
+
+下载地址 [nerdctl](https://github.com/containerd/nerdctl/releases)
 
 ### 安装 NFS 客户端
 
@@ -42,17 +39,11 @@ kubectl delete -f /var/lib/rancher/k3s/server/manifests/traefik.yaml
 
 ### 修改 K3s 启动参数
 
-:::danger
-
-警告：如果你的 K3s 原本使用 Containerd 作为容器运行时，修改为 Docker 作为容器运行时后会导致 Containerd 的数据丢失，不会在 Docker 中出现。
-
-:::
-
 ```bash
 vi /etc/systemd/system/multi-user.target.wants/k3s.service
 
 # 编辑k3s.service文件末尾行
-ExecStart=/usr/local/bin/k3s server --docker --disable traefik
+ExecStart=/usr/local/bin/k3s server
 # 重新加载配置文件
 systemctl daemon-reload
 # 重新启动k3s

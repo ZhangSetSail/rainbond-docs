@@ -23,22 +23,11 @@ During the installation process, the graphical console will be started first thr
 
 ### Deploy the Rainbond Console
 
-The Rainbond console supports running in Linux, Windows (Docker Desktop) or Mac (Docker Desktop).
+The Rainbond console supports running in Linux, Windows or Mac.
 
-- Install Docker
+- Install containerd reference [containerd](https://github.com/containerd/containerd/blob/main/docs/getting-started.md).
 
-
-
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
-
-
-`Remark:`
-
-This installation method only supports the Linux x86 operating system.
-
-
+- Download address for installing [nerdctl](https://github.com/containerd/nerdctl/releases).
 
 #### Install NFS client
 
@@ -58,7 +47,7 @@ apt-get install nfs-common # ubuntu system
 
 
 ```bash
-docker run -d -p 7070:7070 \
+nerdctl run -d -p 7070:7070 \
 --name=rainbond-allinone --restart=always \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \

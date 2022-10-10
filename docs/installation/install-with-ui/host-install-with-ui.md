@@ -21,17 +21,11 @@ description: '基于图形化界面，从主机开始安装 Rainbond '
 
 ### 部署 Rainbond 控制台
 
-Rainbond 控制台支持在 Linux、Windows(Docker Desktop) 或 Mac(Docker Desktop) 中运行。
+Rainbond 控制台支持在 Linux、Windows 或 Mac 中运行。
 
-- 安装Docker
+- 安装containerd 参考 containerd [官方文档](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
 
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
-
-`备注:`
-
-该安装方式仅支持 Linux x86 操作系统。
+- 安装 nerdctl 下载地址 [nerdctl](https://github.com/containerd/nerdctl/releases)
 
 #### 安装 NFS 客户端
 
@@ -44,7 +38,7 @@ apt-get install nfs-common  # ubuntu系统
 #### 启动 All-In-One 控制台
 
 ```bash
-docker run -d -p 7070:7070 \
+nerdctl run -d -p 7070:7070 \
 --name=rainbond-allinone --restart=always \
 -v ~/.ssh:/root/.ssh \
 -v ~/rainbonddata:/app/data \

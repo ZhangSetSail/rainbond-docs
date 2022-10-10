@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 ## 先决条件
 
 :::caution
-1. 集群中所有节点都需要安装 Docker 服务
+1. 集群中所有节点都需要安装 containerd 服务
 2. 集群中所有节点都需要安装 NFS 客户端挂载工具
 3. 指定的网关节点 80、443、6060、6443、7070、8443 端口可用
 4. 集群版本在 1.16 以上
@@ -24,11 +24,13 @@ import TabItem from '@theme/TabItem';
 
 以下列出了一些在安装时可能会用到的服务或命令行工具，如果你已有对应的服务或命令行工具，可以跳过对应的步骤。
 
-### 安装 Docker
-如果你的集群是 Docker 作为运行时，那么此步可以忽略。否则，请保证你集群中的每个节点上都有 Docker 服务。因为平台的日志收集、构建等操作将会挂载 `docker.sock`。
-```bash
-curl sh.rainbond.com/install_docker | bash
-```
+### 安装 containerd
+
+参考 containerd [官方文档](https://github.com/containerd/containerd/blob/main/docs/getting-started.md) 安装。
+
+### 安装 nerdctl
+
+下载地址 [nerdctl](https://github.com/containerd/nerdctl/releases)
 
 ### 安装 NFS 客户端挂载工具
 默认安装时，Rainbond 会启动一个 `nfs-provisioner`，因此，需要节点上安装 NFS 客户端挂载工具，否则会由于无法挂载存储导致安装失败。如果你自定义配置后，使用外部的共享存储。那么此步可以忽略。
